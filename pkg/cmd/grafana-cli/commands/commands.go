@@ -4,7 +4,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/codegangsta/cli"
 	"github.com/fatih/color"
 	"github.com/grafana/grafana/pkg/bus"
 	"github.com/grafana/grafana/pkg/cmd/grafana-cli/commands/datamigrations"
@@ -12,16 +11,17 @@ import (
 	"github.com/grafana/grafana/pkg/cmd/grafana-cli/utils"
 	"github.com/grafana/grafana/pkg/services/sqlstore"
 	"github.com/grafana/grafana/pkg/setting"
+	"github.com/urfave/cli/v2"
 )
 
 func runDbCommand(command func(commandLine utils.CommandLine, sqlStore *sqlstore.SqlStore) error) func(context *cli.Context) {
 	return func(context *cli.Context) {
 		cmd := &utils.ContextCommandLine{Context: context}
-		debug := cmd.GlobalBool("debug")
+		debug := cmd.Bool("debug")
 
 		cfg := setting.NewCfg()
 
-		configOptions := strings.Split(cmd.GlobalString("configOverrides"), " ")
+		configOptions := strings.Split(cmd.String("configOverrides"), " ")
 		if err := cfg.Load(&setting.CommandLineArgs{
 			Config:   cmd.ConfigFile(),
 			HomePath: cmd.HomePath(),
@@ -58,11 +58,11 @@ func runDbCommand(command func(commandLine utils.CommandLine, sqlStore *sqlstore
 	}
 }
 
-func runPluginCommand(command func(commandLine utils.CommandLine) error) func(context *cli.Context) {
-	return func(context *cli.Context) {
-
+func runPluginCommand(command func(commandLine utils.CommandLine) error) func(context *cli.Context) error {
+	return func(context *cli.Context) error {
 		cmd := &utils.ContextCommandLine{Context: context}
 		if err := command(cmd); err != nil {
+			// TODO: Figure out if it's still necessary to print on error
 			logger.Errorf("\n%s: ", color.RedString("Error"))
 			logger.Errorf("%s %s\n\n", color.RedString("✗"), err)
 
@@ -70,7 +70,8 @@ func runPluginCommand(command func(commandLine utils.CommandLine) error) func(co
 				logger.Errorf("\n%s: Failed to show help: %s %s\n\n", color.RedString("Error"),
 					color.RedString("✗"), err)
 			}
-			os.Exit(1)
+
+			return err
 		}
 
 		logger.Info("\nRestart grafana after installing plugins . <service grafana-server restart>\n\n")
