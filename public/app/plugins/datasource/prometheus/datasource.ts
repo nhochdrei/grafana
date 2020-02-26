@@ -48,6 +48,8 @@ interface RequestOptions {
   withCredentials?: boolean;
   silent?: boolean;
   requestId?: string;
+  connectEmpty?: boolean;
+  connectEnd?: boolean;
 }
 
 export interface PromDataQueryResponse {
@@ -191,6 +193,8 @@ export class PrometheusDatasource extends DataSourceApi<PromQuery, PromOptions> 
       responseListLength,
       refId: target.refId,
       valueWithRefId: target.valueWithRefId,
+      connectEmpty: target.connectEmpty,
+      connectEnd: target.connectEnd,
       meta: {
         /** Fix for showing of Prometheus results in Explore table. We want to show result of instant query in table and the rest of time series in graph */
         preferredVisualisationType: query.instant ? 'table' : 'graph',

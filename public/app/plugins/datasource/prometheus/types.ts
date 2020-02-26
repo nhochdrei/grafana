@@ -12,6 +12,8 @@ export interface PromQuery extends DataQuery {
   requestId?: string;
   showingGraph?: boolean;
   showingTable?: boolean;
+  connectEmpty?: boolean;
+  connectEnd?: boolean;
 }
 
 export interface PromOptions extends DataSourceJsonData {
