@@ -48,6 +48,8 @@ interface RequestOptions {
   withCredentials?: boolean;
   silent?: boolean;
   requestId?: string;
+  connectEmpty?: boolean;
+  connectEnd?: boolean;
 }
 
 export interface PromDataQueryResponse {
@@ -189,6 +191,8 @@ export class PrometheusDatasource extends DataSourceApi<PromQuery, PromOptions> 
       responseListLength,
       refId: target.refId,
       valueWithRefId: target.valueWithRefId,
+      connectEmpty: target.connectEmpty,
+      connectEnd: target.connectEnd,
     };
     const series = this.resultTransformer.transform(response, transformerOptions);
 

@@ -29,6 +29,8 @@ interface State {
   interval: string;
   intervalFactorOption: SelectableValue<number>;
   instant: boolean;
+  connectEmpty: boolean;
+  connectEnd: boolean;
 }
 
 export class PromQueryEditor extends PureComponent<Props, State> {
@@ -50,6 +52,8 @@ export class PromQueryEditor extends PureComponent<Props, State> {
         INTERVAL_FACTOR_OPTIONS.find(option => option.value === query.intervalFactor) || INTERVAL_FACTOR_OPTIONS[0],
       // Switch options
       instant: Boolean(query.instant),
+      connectEmpty: Boolean(query.connectEmpty),
+      connectEnd: Boolean(query.connectEnd),
     };
   }
 
@@ -66,6 +70,18 @@ export class PromQueryEditor extends PureComponent<Props, State> {
     const instant = e.target.checked;
     this.query.instant = instant;
     this.setState({ instant }, this.onRunQuery);
+  };
+
+  onConnectEmptyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const connectEmpty = e.target.checked;
+    this.query.connectEmpty = connectEmpty;
+    this.setState({ connectEmpty }, this.onRunQuery);
+  };
+
+  onConnectEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const connectEnd = e.target.checked;
+    this.query.connectEnd = connectEnd;
+    this.setState({ connectEnd }, this.onRunQuery);
   };
 
   onIntervalChange = (e: React.SyntheticEvent<HTMLInputElement>) => {
@@ -93,7 +109,15 @@ export class PromQueryEditor extends PureComponent<Props, State> {
 
   render() {
     const { datasource, query, data } = this.props;
-    const { formatOption, instant, interval, intervalFactorOption, legendFormat } = this.state;
+    const {
+      formatOption,
+      instant,
+      interval,
+      intervalFactorOption,
+      legendFormat,
+      connectEmpty,
+      connectEnd,
+    } = this.state;
 
     return (
       <div>
@@ -161,6 +185,8 @@ export class PromQueryEditor extends PureComponent<Props, State> {
             <div className="gf-form-label">Format</div>
             <Select isSearchable={false} options={FORMAT_OPTIONS} onChange={this.onFormatChange} value={formatOption} />
             <Switch label="Instant" checked={instant} onChange={this.onInstantChange} />
+            <Switch label="Connect empty" checked={connectEmpty} onChange={this.onConnectEmptyChange} />
+            <Switch label="Connect end" checked={connectEnd} onChange={this.onConnectEndChange} />
 
             <FormLabel width={10} tooltip="Link to Graph in Prometheus">
               <PromLink
