@@ -342,7 +342,7 @@ describe('Prometheus Result Transformer', () => {
         format: 'timeseries',
         step: 1,
         start: 0,
-        end: 2,
+        end: 3,
       };
 
       const result = ctx.resultTransformer.transform({ data: response }, options);
@@ -351,10 +351,13 @@ describe('Prometheus Result Transformer', () => {
           target: 'test{job="testjob"}',
           title: 'test{job="testjob"}',
           query: undefined,
+          meta: undefined,
+          refId: undefined,
           datapoints: [
             [null, 0],
             [10, 1000],
             [0, 2000],
+            [null, 3000],
           ],
           tags: { job: 'testjob' },
         },
@@ -460,6 +463,93 @@ describe('Prometheus Result Transformer', () => {
             [10, 4000],
             [null, 6000],
             [10, 8000],
+          ],
+          tags: { job: 'testjob' },
+        },
+      ]);
+    });
+
+    it('should fill the timeseries last values with the last known when configured', () => {
+      const response = {
+        status: 'success',
+        data: {
+          resultType: 'matrix',
+          result: [
+            {
+              metric: { __name__: 'test', job: 'testjob' },
+              values: [
+                [1, '10'],
+                [2, '42'],
+              ],
+            },
+          ],
+        },
+      };
+      const options = {
+        format: 'timeseries',
+        step: 1,
+        start: 0,
+        end: 3,
+        connectEnd: true,
+      };
+
+      const result = ctx.resultTransformer.transform({ data: response }, options);
+      expect(result).toEqual([
+        {
+          target: 'test{job="testjob"}',
+          title: 'test{job="testjob"}',
+          query: undefined,
+          meta: undefined,
+          refId: undefined,
+          datapoints: [
+            [null, 0],
+            [10, 1000],
+            [42, 2000],
+            [42, 3000],
+          ],
+          tags: { job: 'testjob' },
+        },
+      ]);
+    });
+
+    it('should connect empty timeseries values with the last known when configured', () => {
+      const response = {
+        status: 'success',
+        data: {
+          resultType: 'matrix',
+          result: [
+            {
+              metric: { __name__: 'test', job: 'testjob' },
+              values: [
+                [1, '10'],
+                [3, '42'],
+              ],
+            },
+          ],
+        },
+      };
+      const options = {
+        format: 'timeseries',
+        step: 1,
+        start: 0,
+        end: 4,
+        connectEmpty: true,
+      };
+
+      const result = ctx.resultTransformer.transform({ data: response }, options);
+      expect(result).toEqual([
+        {
+          target: 'test{job="testjob"}',
+          title: 'test{job="testjob"}',
+          query: undefined,
+          meta: undefined,
+          refId: undefined,
+          datapoints: [
+            [10, 0],
+            [10, 1000],
+            [10, 2000],
+            [42, 3000],
+            [null, 4000],
           ],
           tags: { job: 'testjob' },
         },

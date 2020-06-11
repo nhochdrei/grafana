@@ -52,23 +52,29 @@ export class ResultTransformer {
       throw new Error('Prometheus heatmap error: data should be a time series');
     }
 
+    let last = null;
     for (const value of metricData.values) {
       let dpValue = parseFloat(value[1]);
       if (_.isNaN(dpValue)) {
         dpValue = null;
       }
 
+      const filler = options.connectEmpty ? last || dpValue : null;
       const timestamp = parseFloat(value[0]) * 1000;
       for (let t = baseTimestamp; t < timestamp; t += stepMs) {
-        dps.push([null, t]);
+        dps.push([filler, t]);
       }
       baseTimestamp = timestamp + stepMs;
       dps.push([dpValue, timestamp]);
+      last = dpValue;
     }
 
+    if (!options.connectEnd) {
+      last = null;
+    }
     const endTimestamp = end * 1000;
     for (let t = baseTimestamp; t <= endTimestamp; t += stepMs) {
-      dps.push([null, t]);
+      dps.push([last, t]);
     }
 
     return {

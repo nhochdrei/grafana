@@ -155,6 +155,16 @@ exports[`Render PromQueryEditor with basic options should render 1`] = `
         label="Instant"
         onChange={[Function]}
       />
+      <Switch
+        checked={false}
+        label="Connect empty"
+        onChange={[Function]}
+      />
+      <Switch
+        checked={false}
+        label="Connect end"
+        onChange={[Function]}
+      />
       <Component
         tooltip="Link to Graph in Prometheus"
         width={10}
