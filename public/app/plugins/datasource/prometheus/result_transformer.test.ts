@@ -351,11 +351,13 @@ describe('Prometheus Result Transformer', () => {
           target: 'test{job="testjob"}',
           title: 'test{job="testjob"}',
           query: undefined,
+          meta: undefined,
+          refId: undefined,
           datapoints: [
             [null, 0],
             [10, 1000],
             [0, 2000],
-            [null, 3000]
+            [null, 3000],
           ],
           tags: { job: 'testjob' },
         },
@@ -467,7 +469,7 @@ describe('Prometheus Result Transformer', () => {
       ]);
     });
 
-    it('should fill the timeseries last values with the last known when configured' , () => {
+    it('should fill the timeseries last values with the last known when configured', () => {
       const response = {
         status: 'success',
         data: {
@@ -495,7 +497,10 @@ describe('Prometheus Result Transformer', () => {
       expect(result).toEqual([
         {
           target: 'test{job="testjob"}',
+          title: 'test{job="testjob"}',
           query: undefined,
+          meta: undefined,
+          refId: undefined,
           datapoints: [
             [null, 0],
             [10, 1000],
@@ -507,7 +512,7 @@ describe('Prometheus Result Transformer', () => {
       ]);
     });
 
-    it('should connect empty timeseries values with the last known when configured' , () => {
+    it('should connect empty timeseries values with the last known when configured', () => {
       const response = {
         status: 'success',
         data: {
@@ -535,7 +540,10 @@ describe('Prometheus Result Transformer', () => {
       expect(result).toEqual([
         {
           target: 'test{job="testjob"}',
+          title: 'test{job="testjob"}',
           query: undefined,
+          meta: undefined,
+          refId: undefined,
           datapoints: [
             [10, 0],
             [10, 1000],
